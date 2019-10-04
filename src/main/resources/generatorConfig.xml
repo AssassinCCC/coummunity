@@ -4,7 +4,9 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-
+    <!-- 自动识别数据库关键字，默认false，如果设置为true，根据SqlReservedWords中定义的关键字列表；
+    一般保留默认值，遇到数据库关键字（Java关键字），使用columnOverride覆盖
+    -->
     <context id="DB2Tables" targetRuntime="MyBatis3">
 
         <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"></plugin>
@@ -17,12 +19,22 @@
         <javaTypeResolver >
             <property name="forceBigDecimals" value="false" />
         </javaTypeResolver>
-
+        <!-- for MyBatis3/MyBatis3Simple
+        自动为每一个生成的类创建一个构造方法，构造方法包含了所有的field；而不是使用setter；
+        -->
         <javaModelGenerator targetPackage="life.majiang.community.model" targetProject="src/main/java">
             <property name="enableSubPackages" value="true" />
             <property name="trimStrings" value="true" />
         </javaModelGenerator>
-
+        <!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
+        <!-- 对于mybatis来说，即生成Mapper接口，注意，如果没有配置该元素，那么默认不会生成Mapper接口
+targetPackage/targetProject:同javaModelGenerator
+type：选择怎么生成mapper接口（在MyBatis3/MyBatis3Simple下）：
+1，ANNOTATEDMAPPER：会生成使用Mapper接口+Annotation的方式创建（SQL生成在annotation中），不会生成对应的XML；
+2，MIXEDMAPPER：使用混合配置，会生成Mapper接口，并适当添加合适的Annotation，但是XML会生成在XML中；
+3，XMLMAPPER：会生成Mapper接口，接口完全依赖XML；
+注意，如果context是MyBatis3Simple：只支持ANNOTATEDMAPPER和XMLMAPPER
+-->
         <sqlMapGenerator targetPackage="mapper"  targetProject="src/main/resources">
             <property name="enableSubPackages" value="true" />
         </sqlMapGenerator>
@@ -34,6 +46,8 @@
         <table tableName="user" domainObjectName="User" >
         </table>
         <table tableName="question" domainObjectName="Question" >
+        </table>
+        <table tableName="comment" domainObjectName="Comment" >
         </table>
     </context>
 </generatorConfiguration>
